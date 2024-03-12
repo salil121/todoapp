@@ -7,9 +7,9 @@ This is a simple to-do list application built using HTML, CSS, JavaScript for th
 - **Add Task**: Users can add new tasks to the to-do list.
 - **Update Task**: Users can update existing tasks.
 - **Delete Task**: Users can delete tasks from the list.
-- **Delete all Task**: Users can delete all tasks in one go from the list .
+- **Delete All Task** : Users can delete all task in one go .
 - **Responsive Design**: The application is responsive and works well on various screen sizes.
-- **Data Persistence**: Once the data is added it will persist across multiple requeste until that data is deleted .
+- **Data Persistence**: Data will be persisted across multiple request as we are saving data in database .
 
 ## Technologies Used
 
@@ -24,20 +24,32 @@ This is a simple to-do list application built using HTML, CSS, JavaScript for th
 
 ## How to Use
 
-1. Install dependencies:
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/salil121/todoapp.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd todoapp
+   ```
+
+3. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Set up MongoDB:
+4. Set up MongoDB:
    - Install MongoDB on your system if not already installed.
    - Start the MongoDB server.
 
-3. Run the application:
+5. Run the application:
 
    ```bash
    npm start
    ```
 
-4. Open your browser and navigate to `http://localhost:3000` to use the to-do list application .
+6. Open your browser and navigate to `http://localhost:3000` to use the to-do list application.
