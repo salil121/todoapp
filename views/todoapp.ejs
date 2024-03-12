@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="stylesheet" href="css/css/all.css">
+        <title> TO DO APP </title>
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <body>
+        <div class="container">
+            <h2 class="heading"> TO DO APP </h2>
+            <p class="line"> </p>
+            <form class="addForm"> <!-- This will accept the user task -->
+                <input type="text" class="formValue" placeholder="Enter to do ..."/>
+                <button type="submit" class="dataAddBtn"> ADD </button>
+            </form>
+            <button class="deleteAll"> DELETE ALL </button> <!-- This button will delete all task . -->
+            <div class="boxes">
+                <% if(dataList.length > 0){ %>
+                    <% dataList.forEach((data) => { %>
+                        <div class="box">
+                            <div class="first"> 
+                                <p class="para"> <%= data.title %> </p>
+                            </div>
+                            <div class="second">
+                                <i class="fas fa-trash-alt deleteIcon" title="Delete Tab" value="<%= data._id %>"></i>
+                                <i class="fas fa-edit editIcon" title="Edit Text" value="<%= data._id %>"></i>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
+        <div class="firstModal"> <!-- This modal will open when user wants to delete all tasks -->
+            <div class="firstModalContent">
+                <p class="firstPara"> Are you sure you want to delete all data ? </p>
+                <button class="yesBtn"> YES </button>
+                <button class="noBtn"> NO </button>
+            </div>
+        </div>
+        <div class="secondModal"> <!-- This modal will open when user wants to update a single task -->
+            <div class="secondModalContent">
+                <span class="closeModal"> &times; </span>
+                <textarea class="textBox"> </textarea>
+                <button class="save"> SAVE </button>
+            </div>
+        </div>
+
+        <script>
+        
+        // Accessing elements
+        const formValue = document.getElementsByClassName("formValue")[0];
+        const dataAddBtn = document.getElementsByClassName("dataAddBtn")[0];
+        const boxes = document.querySelector('.boxes');
+        const deleteAll = document.querySelector('.deleteAll');
+        const firstModal = document.querySelector('.firstModal');
+        const yesBtn = document.querySelector('.yesBtn');
+        const noBtn = document.querySelector('.noBtn');
+        const secondModal = document.querySelector('.secondModal');
+        const closeModal = document.querySelector('.closeModal');
+        const save = document.querySelector('.save');
+        const secondTextBox = document.querySelector('.textBox');
+        
+        // This function is used to add data within the database with the help of fetch api .
+        dataAddBtn.addEventListener('click',(e) => {
+
+            e.preventDefault();
+
+            const title = formValue.value;
+
+            const url = "/addData";
+
+            if(title == ''){
+                alert("Fields can not be empty !!");
+                return;
+            }
+
+            fetch(url,{
+                method:"POST",
+                headers:{
+                    'Content-Type':"application/json"
+                },
+                body:JSON.stringify({
+                    title:title,
+                })
+            }).then((result) => {
+                if(result.status !== 200){
+                    throw new Error("Can not perform the request right now , please come back after sometime !!");
+                }else{
+                    return result.json();
+                }
+            }).then((res) => {
+                location.reload();
+            }).catch((err) => {
+                console.log(err.message);
+                alert(err.message);
+            })
+
+        });
+
+        // Adding functionality to delete all button .
+        deleteAll.addEventListener('click',()=>{
+            if(boxes.childElementCount > 0){
+                firstModal.style.display = "block";
+            }else{
+                alert('Nothing to delete');
+            }
+        });
+
+        // Onclicking delete all button a modal will appear which will ask whether you want to delete 
+        // all data or not . If user clicks on yes button , then below fetch api will be called .
+        yesBtn.addEventListener('click',()=>{
+
+            const url = "/deleteAllData";
+
+            fetch(url,{
+                method:"DELETE"
+            }).then((result) => {
+                if(result.status !== 200){
+                    throw new Error("Can not delete data right now !!");
+                }else{
+                    return result.json();
+                }
+            }).then((res) => {
+                window.location.href = res.redirect;
+            })
+            .catch((err) => {
+                console.log(err.message);
+                alert(err.message);
+            })
+
+        });
+
+        // However if user clicks on no button the delete all modal will be closed .
+        noBtn.addEventListener('click',()=>{
+            firstModal.style.display = "none";
+        });
+
+
+        // Adding functionality to single delete button 
+        boxes.addEventListener('click',(event) => {
+
+            if(event.target.matches('.deleteIcon')){
+
+                const deleteTarget = event.target.getAttribute('value');
+
+                const url = `/deleteTask/${deleteTarget}`;
+
+                fetch(url,{
+                    method:"DELETE"
+                }).then((result) => {
+                    if(result.status !== 200){
+                        alert("Not a valid data id to delete the task !!");
+                    }else{
+                        return result.json();
+                    }
+                }).then((res) => {
+                    window.location.href = res.redirect;
+                })
+                .catch((err) => {
+                    console.log(err.message);
+                    alert(err.message);
+                });
+
+            };
+
+        });
+
+
+        // Functionality to update single data .
+        let updateTar;
+        let currentPara;
+        boxes.addEventListener('click',(event)=>{
+            if(event.target.matches('.editIcon')){
+                updateTar = event.target.getAttribute('value');
+                currentPara = event.target.parentElement.previousElementSibling.querySelector('.para');
+                secondTextBox.value = currentPara.textContent;
+                secondModal.style.display = "block";
+            }
+        });
+
+        // If a user wants to save the changes .
+        save.addEventListener('click',()=>{
+            
+            const url = `/update/${updateTar}`;
+
+            fetch(url,{
+                method:"PATCH",
+            headers:{
+                'Content-Type':"application/json"
+            },
+            body:JSON.stringify({
+                title:secondTextBox.value
+            })
+            }).then((result) => {
+                if(result.status !== 200){
+                    throw new Error("Can not perform the request right now , please come back after sometime !!");
+                }else{
+                    return result.json();
+                }
+            }).then((res) => {
+                window.location.href = res.redirect;
+            }).catch((err) => {
+                console.log(err.message);
+                alert(err.message);
+            });
+
+            secondModal.style.display = "none";
+        });
+
+        closeModal.addEventListener('click',()=>{
+            secondModal.style.display = "none";
+        });
+
+        </script>
+    </body>
+</html>
